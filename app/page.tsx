@@ -143,7 +143,12 @@ export default function HieuHubMaster() {
 
   const handleLogin = (e: any) => {
     e.preventDefault();
-    if (username.trim() !== "" && password === "hieuhub2026") {
+    
+    // Gọi mật khẩu từ Vercel ra. 
+    // Nếu trên máy bạn chưa cấu hình .env thì nó tạm dùng pass dự phòng "123456"
+    const secretPassword = process.env.NEXT_PUBLIC_APP_PASSWORD || "123456";
+
+    if (username.trim() !== "" && password === secretPassword) {
       localStorage.setItem("hieu_hub_user", username);
       setIsLoggedIn(true);
     } else {
