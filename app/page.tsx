@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown'; 
 
 // ==========================================
-// CẤU HÌNH THEME (GIỮ NGUYÊN GLOW)
+// CẤU HÌNH THEME (ĐÃ TƯƠNG THÍCH TYPESCRIPT)
 // ==========================================
 const THEMES = [
   {
@@ -84,7 +84,7 @@ const THEMES = [
 ];
 
 export default function HieuHubMaster() {
-  const [currentTheme, setCurrentTheme] = useState(THEMES[0]);
+  const [currentTheme, setCurrentTheme] = useState<any>(THEMES[0]);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
@@ -97,7 +97,8 @@ export default function HieuHubMaster() {
   const defaultUrl = "https://docs.google.com/spreadsheets/d/1Cryecd2kF8cmpXGfhsKFenMT89XHhyaMJyx7wkeUxa4/edit#gid=1604492918";
   const currentSheetUrl = dbMode === "Mẫu của Hieu" ? defaultUrl : customSheetUrl;
 
-  const [allData, setAllData] = useState([]);
+  // Thêm <any> để Typescript không báo lỗi mảng rỗng
+  const [allData, setAllData] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [alphaFilter, setAlphaFilter] = useState("ALL");
   const ALPHABETS = ['ALL', 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
@@ -108,16 +109,16 @@ export default function HieuHubMaster() {
   const QUIZ_MODES = ["Dạng 1 (Trắc nghiệm)", "Dạng 2 (Làm đâu biết đó)", "Dạng 3 (Viết từ)", "Dạng 4 (Loại từ)", "Dạng 5 (Giới từ)", "Dạng 6 (Chọn từ)", "Dạng 7 (Đồng nghĩa)", "Dạng 8 (Trái nghĩa)"];
   const [quizMode, setQuizMode] = useState("Dạng 1 (Trắc nghiệm)");
   const [isQuizDropdownOpen, setIsQuizDropdownOpen] = useState(false);
-  const [quizQuestions, setQuizQuestions] = useState([]);
+  const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
   const [quizIdx, setQuizIdx] = useState(0);
-  const [quizFeedback, setQuizFeedback] = useState(null);
+  const [quizFeedback, setQuizFeedback] = useState<any>(null);
   const [userTyped, setUserTyped] = useState('');
-  const [numQuestions, setNumQuestions] = useState(10);
-  const [dang1Answers, setDang1Answers] = useState({});
+  const [numQuestions, setNumQuestions] = useState<number | string>(10);
+  const [dang1Answers, setDang1Answers] = useState<any>({});
   const [dang1Submitted, setDang1Submitted] = useState(false);
-  const [wrongAnswers, setWrongAnswers] = useState([]);
+  const [wrongAnswers, setWrongAnswers] = useState<any[]>([]);
 
-  const [chatMessages, setChatMessages] = useState([]);
+  const [chatMessages, setChatMessages] = useState<any[]>([]);
   const [chatInput, setChatInput] = useState("");
 
   const MENUS = ["⚙️ Dashboard Quản lý", "💎 Flashcard", "📝 Kiểm tra", "📊 Lịch sử Câu sai", "🤖 Trợ lý AI"];
@@ -135,12 +136,12 @@ export default function HieuHubMaster() {
     }
   }, []);
 
-  const changeTheme = (theme) => {
+  const changeTheme = (theme: any) => {
     setCurrentTheme(theme);
     localStorage.setItem("hieu_hub_theme", theme.id);
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = (e: any) => {
     e.preventDefault();
     if (username.trim() !== "" && password === "hieuhub2026") {
       localStorage.setItem("hieu_hub_user", username);
@@ -182,7 +183,7 @@ export default function HieuHubMaster() {
     if(activeTab === "📝 Kiểm tra" && isLoggedIn) loadQuiz(); 
   }, [quizMode, activeTab, isLoggedIn]);
 
-  const checkQuizAnswer = (answer) => {
+  const checkQuizAnswer = (answer: any) => {
     if (quizFeedback) return;
     const currentQ = quizQuestions[quizIdx];
     const isCorrect = answer.toString().trim().toLowerCase() === currentQ.answer.toString().trim().toLowerCase();
@@ -200,15 +201,15 @@ export default function HieuHubMaster() {
     }
   };
 
-  const handleDang1Select = (qIndex, option) => {
+  const handleDang1Select = (qIndex: number, option: string) => {
     if (dang1Submitted) return;
-    setDang1Answers(prev => ({ ...prev, [qIndex]: option }));
+    setDang1Answers((prev: any) => ({ ...prev, [qIndex]: option }));
   };
 
   const handleSubmitDang1 = () => {
     setDang1Submitted(true);
-    const newMistakes = [];
-    quizQuestions.forEach((q, i) => {
+    const newMistakes: any[] = [];
+    quizQuestions.forEach((q: any, i: number) => {
       const uAns = dang1Answers[i];
       if (uAns !== q.answer) {
         newMistakes.push({ question: q.title, info: q.subtitle, userAnswer: uAns || "Chưa chọn", correctAnswer: q.answer, mode: "Dạng 1 (Trắc nghiệm)" });
@@ -219,25 +220,25 @@ export default function HieuHubMaster() {
 
   const calculateDang1Score = () => {
     let score = 0;
-    quizQuestions.forEach((q, i) => { if (dang1Answers[i] === q.answer) score += 1; });
+    quizQuestions.forEach((q: any, i: number) => { if (dang1Answers[i] === q.answer) score += 1; });
     return score;
   };
 
   const sendAiMessage = async () => {
     if(!chatInput.trim()) return;
     const userMsg = { role: "user", content: chatInput };
-    setChatMessages(prev => [...prev, userMsg]);
+    setChatMessages((prev: any) => [...prev, userMsg]);
     setChatInput("");
     try {
       const res = await axios.post('https://hieu-hub-backend.onrender.com/api/ask-ai', { prompt: userMsg.content });
-      setChatMessages(prev => [...prev, { role: "ai", content: res.data.reply }]);
+      setChatMessages((prev: any) => [...prev, { role: "ai", content: res.data.reply }]);
     } catch(e) {}
   };
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: any) => {
       if (!isLoggedIn || activeTab !== "📝 Kiểm tra" || quizQuestions.length === 0) return;
-      if (document.activeElement.tagName === 'INPUT' && quizMode !== "Dạng 3 (Viết từ)") return;
+      if (document.activeElement?.tagName === 'INPUT' && quizMode !== "Dạng 3 (Viết từ)") return;
       if (quizIdx >= quizQuestions.length && quizMode !== "Dạng 1 (Trắc nghiệm)") return;
 
       if (e.key === 'Enter') {
@@ -267,7 +268,7 @@ export default function HieuHubMaster() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [activeTab, quizQuestions, quizIdx, quizFeedback, quizMode, userTyped, isLoggedIn]);
 
-  const filteredDashboardData = allData.filter(item => {
+  const filteredDashboardData = allData.filter((item: any) => {
     const word = (item['Từ'] || '').toLowerCase();
     const meaning = (item['Nghĩa'] || '').toLowerCase();
     const searchLow = searchTerm.toLowerCase();
@@ -287,19 +288,19 @@ export default function HieuHubMaster() {
             <div className={`w-20 h-20 mx-auto bg-gradient-to-br ${currentTheme.primaryGradient} rounded-3xl flex items-center justify-center ${currentTheme.shadowGlow} mb-4 border border-white/20`}>
               <span className="text-4xl">🚀</span>
             </div>
-            <h1 className={`text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-white ${currentTheme.textGradient} tracking-tight`}>Hieu's Hub</h1>
+            <h1 className={`text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-white ${currentTheme.textGradient} tracking-tight`}>Hieu&apos;s Hub</h1>
             <p className="text-gray-400 mt-2 text-sm font-medium">Hệ thống ôn luyện TOEIC & AI Tutor</p>
           </div>
 
           <form onSubmit={handleLogin} className="relative z-20 flex flex-col gap-4">
             <div>
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 pl-1">Tên của bạn</label>
-              <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required placeholder="VD: Hieu Dang..." className={`w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white outline-none ${currentTheme.borderFocus} focus:bg-black/60 transition-colors shadow-inner`} />
+              <input type="text" value={username} onChange={(e: any) => setUsername(e.target.value)} required placeholder="VD: Hieu Dang..." className={`w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white outline-none ${currentTheme.borderFocus} focus:bg-black/60 transition-colors shadow-inner`} />
             </div>
             
             <div className="mb-4">
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 pl-1">Mật khẩu</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Nhập mật khẩu..." className={`w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white outline-none ${currentTheme.borderFocus} focus:bg-black/60 transition-colors shadow-inner`} />
+              <input type="password" value={password} onChange={(e: any) => setPassword(e.target.value)} required placeholder="Nhập mật khẩu..." className={`w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white outline-none ${currentTheme.borderFocus} focus:bg-black/60 transition-colors shadow-inner`} />
             </div>
 
             <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" className={`w-full py-4 bg-gradient-to-r ${currentTheme.primaryGradient} text-white font-bold rounded-xl ${currentTheme.shadowGlow} tracking-widest uppercase text-sm mt-2`}>
@@ -331,7 +332,7 @@ export default function HieuHubMaster() {
 
         <div className="flex flex-col gap-2 flex-1 relative z-10">
           <h3 className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.1em] mb-1 pl-2">Menu</h3>
-          {MENUS.map(m => (
+          {MENUS.map((m: any) => (
             <motion.button 
               key={m} onClick={() => setActiveTab(m)}
               whileHover={{ scale: 1.02, x: 3 }} whileTap={{ scale: 0.95 }}
@@ -350,7 +351,7 @@ export default function HieuHubMaster() {
             <span>🎨</span> Đổi Chủ Đề
           </h3>
           <div className="flex justify-between gap-2">
-            {THEMES.map(t => (
+            {THEMES.map((t: any) => (
               <button
                 key={t.id}
                 onClick={() => changeTheme(t)}
@@ -373,7 +374,7 @@ export default function HieuHubMaster() {
             <AnimatePresence>
               {isDbDropdownOpen && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="absolute bottom-full w-full mb-1 bg-[#0f172a] border border-white/10 rounded-lg shadow-2xl overflow-hidden z-[100]">
-                  {["Mẫu của Hieu", "Sheets cá nhân"].map(m => (
+                  {["Mẫu của Hieu", "Sheets cá nhân"].map((m: any) => (
                     <button key={m} onClick={() => { setDbMode(m); setIsDbDropdownOpen(false); }} className={`w-full text-left px-3 py-2 text-xs transition-colors ${dbMode === m ? `${currentTheme.bgBadge} ${currentTheme.textAccent}` : 'text-gray-300 hover:bg-white/5'}`}>
                       {m}
                     </button>
@@ -386,7 +387,7 @@ export default function HieuHubMaster() {
           <AnimatePresence>
             {dbMode === "Sheets cá nhân" && (
               <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mb-2 overflow-hidden">
-                <input type="text" placeholder="Dán link Google Sheets..." value={customSheetUrl} onChange={(e) => setCustomSheetUrl(e.target.value)} className={`w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none ${currentTheme.borderFocus} transition-colors shadow-inner`} />
+                <input type="text" placeholder="Dán link Google Sheets..." value={customSheetUrl} onChange={(e: any) => setCustomSheetUrl(e.target.value)} className={`w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none ${currentTheme.borderFocus} transition-colors shadow-inner`} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -407,15 +408,15 @@ export default function HieuHubMaster() {
               <div>
                 <h2 className={`text-3xl font-black mb-6 text-transparent bg-clip-text bg-gradient-to-r ${currentTheme.textGradient}`}>Kho Từ Vựng</h2>
                 <div className="bg-white/5 backdrop-blur-xl p-5 rounded-2xl border border-white/10 mb-6 shadow-xl flex flex-col md:flex-row gap-4 items-center relative z-20">
-                  <input type="text" placeholder="🔍 Tìm kiếm từ vựng..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={`flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-base text-white outline-none ${currentTheme.borderFocus} transition-colors shadow-inner w-full`} />
+                  <input type="text" placeholder="🔍 Tìm kiếm từ vựng..." value={searchTerm} onChange={(e: any) => setSearchTerm(e.target.value)} className={`flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-base text-white outline-none ${currentTheme.borderFocus} transition-colors shadow-inner w-full`} />
                   <div className="flex bg-black/40 p-1.5 rounded-xl border border-white/10 overflow-x-auto w-full md:w-auto">
-                    {ALPHABETS.slice(0, 10).map(letter => <button key={letter} onClick={() => setAlphaFilter(letter)} className={`min-w-[32px] h-8 rounded-lg font-bold transition-all text-xs ${alphaFilter === letter ? `${currentTheme.bgAccent} text-white shadow-lg` : 'text-gray-400 hover:bg-white/10'}`}>{letter}</button>)}
+                    {ALPHABETS.slice(0, 10).map((letter: any) => <button key={letter} onClick={() => setAlphaFilter(letter)} className={`min-w-[32px] h-8 rounded-lg font-bold transition-all text-xs ${alphaFilter === letter ? `${currentTheme.bgAccent} text-white shadow-lg` : 'text-gray-400 hover:bg-white/10'}`}>{letter}</button>)}
                     <span className="text-gray-600 self-center px-1 text-xs">...</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {filteredDashboardData.length > 0 ? filteredDashboardData.map((item, i) => (
+                  {filteredDashboardData.length > 0 ? filteredDashboardData.map((item: any, i: number) => (
                     <motion.div key={i} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: (i % 15) * 0.02 }} whileHover={{ y: -4 }} className={`bg-white/5 backdrop-blur-sm p-5 rounded-2xl border border-white/10 shadow-lg hover:${currentTheme.shadowGlow} hover:bg-white/10 transition-all cursor-default group relative overflow-hidden`}>
                       <div className="absolute top-0 right-0 p-3 opacity-5 group-hover:opacity-10 transition-opacity"><span className={`text-5xl font-black ${currentTheme.textAccent}`}>{item['Từ'][0]?.toUpperCase()}</span></div>
                       <div className="flex justify-between items-start mb-3">
@@ -486,7 +487,7 @@ export default function HieuHubMaster() {
                     <AnimatePresence>
                       {isQuizDropdownOpen && (
                         <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} className="absolute w-full mt-2 bg-[#0f172a] border border-white/10 rounded-xl shadow-[0_15px_30px_rgba(0,0,0,0.8)] overflow-hidden z-[100]">
-                          {QUIZ_MODES.map(m => (
+                          {QUIZ_MODES.map((m: any) => (
                             <button key={m} onClick={() => { setQuizMode(m); setIsQuizDropdownOpen(false); }} className={`w-full text-left p-3.5 text-sm font-bold transition-colors ${quizMode === m ? `${currentTheme.bgBadge} ${currentTheme.textAccent} border-l-4 ${currentTheme.borderAccent}` : 'text-gray-300 hover:bg-white/5 border-l-4 border-transparent'}`}>
                               {m}
                             </button>
@@ -500,7 +501,7 @@ export default function HieuHubMaster() {
                     {quizMode === "Dạng 1 (Trắc nghiệm)" && (
                       <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mb-6 overflow-hidden">
                         <label className="block text-gray-400 font-bold mb-3 text-xs uppercase tracking-widest">Số lượng: <span className="text-white text-lg ml-1">{numQuestions}</span></label>
-                        <input type="range" min="5" max="50" step="5" value={numQuestions} onChange={(e) => setNumQuestions(e.target.value)} className={`w-full cursor-pointer h-1.5 bg-gray-800 rounded-lg appearance-none ${currentTheme.accentClass}`} />
+                        <input type="range" min="5" max="50" step="5" value={numQuestions} onChange={(e: any) => setNumQuestions(e.target.value)} className={`w-full cursor-pointer h-1.5 bg-gray-800 rounded-lg appearance-none ${currentTheme.accentClass}`} />
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -514,29 +515,28 @@ export default function HieuHubMaster() {
                   <div>
                     {quizMode === "Dạng 1 (Trắc nghiệm)" ? (
                       <div className="space-y-4">
-                        {quizQuestions.map((q, i) => (
+                        {quizQuestions.map((q: any, i: number) => (
                           <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg relative z-0">
                             <h3 className="text-xl font-bold mb-3 text-white">{q.title}</h3>
                             {q.subtitle && (
                               <div className="mb-4 p-3 rounded-lg bg-black/30 border border-white/5 text-gray-300 text-sm flex flex-wrap gap-x-4 gap-y-2 font-medium">
-                                {q.subtitle.split("  |  ").map((info, idx) => <span key={idx} className="flex items-center">{info}</span>)}
+                                {q.subtitle.split("  |  ").map((info: any, idx: number) => <span key={idx} className="flex items-center">{info}</span>)}
                               </div>
                             )}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                              {(q.options || []).map((opt, optIdx) => {
+                              {(q.options || []).map((opt: any, optIdx: number) => {
                                 const isSelected = dang1Answers[i] === opt;
                                 const isCorrectAnswer = opt === q.answer;
                                 
-                                // FIX: Loại bỏ transition-all để không bị đụng độ Framer Motion
                                 let btnClass = "bg-black/40 border-white/10 text-gray-300 transition-colors transition-shadow duration-300";
                                 let iconClass = "bg-white/10 text-gray-400 transition-colors duration-300";
 
                                 if (!dang1Submitted) {
                                   if (isSelected) {
-                                    btnClass += ` ${currentTheme.selectedAns}`; // Màu nền sáng nổi lên khi Đã chọn
+                                    btnClass += ` ${currentTheme.selectedAns}`;
                                     iconClass = "bg-white/20 text-white";
                                   } else {
-                                    btnClass += ` ${currentTheme.hoverAns}`; // Dải đèn mờ khi Di chuột
+                                    btnClass += ` ${currentTheme.hoverAns}`;
                                   }
                                 } else {
                                   if (isCorrectAnswer) {
@@ -556,8 +556,8 @@ export default function HieuHubMaster() {
                                 return (
                                   <motion.button key={optIdx} 
                                     initial={false}
-                                    animate={{ scale: isSelected && !dang1Submitted ? 1.02 : 1 }} // Nảy bự lên khi được chọn
-                                    whileHover={!dang1Submitted && !isSelected ? { scale: 1.03 } : {}} // Phóng to nhẹ khi di chuột
+                                    animate={{ scale: isSelected && !dang1Submitted ? 1.02 : 1 }} 
+                                    whileHover={!dang1Submitted && !isSelected ? { scale: 1.03 } : {}} 
                                     whileTap={!dang1Submitted ? { scale: 0.95 } : {}} 
                                     onClick={() => handleDang1Select(i, opt)} 
                                     disabled={dang1Submitted} 
@@ -597,16 +597,15 @@ export default function HieuHubMaster() {
                         )}
                       </div>
                     ) : (
-                      // DẠNG 2-8
                       <div>
                         {quizIdx >= quizQuestions.length ? (
                           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="mt-8 p-10 bg-black/60 backdrop-blur-xl rounded-3xl text-center border border-white/20 shadow-2xl relative z-0">
                             <h2 className="text-3xl font-bold mb-4 text-white">🎉 Đã hoàn thành!</h2>
                             <p className="text-gray-300 mb-6">Bạn đã hoàn thành bộ câu hỏi Dạng {quizMode}.</p>
                             
-                            {wrongAnswers.filter(w => w.mode === quizMode).length > 0 && (
+                            {wrongAnswers.filter((w: any) => w.mode === quizMode).length > 0 && (
                               <p className="mt-4 text-gray-300 bg-white/5 border border-white/10 py-3 rounded-xl inline-block px-6">
-                                Phát hiện <span className="font-bold text-red-400">{wrongAnswers.filter(w => w.mode === quizMode).length}</span> lỗi sai. Đã lưu vào Sidebar!
+                                Phát hiện <span className="font-bold text-red-400">{wrongAnswers.filter((w: any) => w.mode === quizMode).length}</span> lỗi sai. Đã lưu vào Sidebar!
                               </p>
                             )}
 
@@ -624,20 +623,19 @@ export default function HieuHubMaster() {
                             <h2 className="text-3xl font-bold mb-4 leading-tight text-white">{quizQuestions[quizIdx].title}</h2>
                             {quizQuestions[quizIdx].subtitle && (
                                <div className={`mb-6 p-4 rounded-xl bg-black/40 border border-white/5 ${currentTheme.textAccent} text-sm flex flex-wrap gap-x-5 gap-y-2 font-medium`}>
-                                 {quizQuestions[quizIdx].subtitle.split("  |  ").map((info, idx) => <span key={idx}>{info}</span>)}
+                                 {quizQuestions[quizIdx].subtitle.split("  |  ").map((info: any, idx: number) => <span key={idx}>{info}</span>)}
                                </div>
                             )}
                             
                             {quizQuestions[quizIdx].type === 'typing' ? (
                               <div className="mt-6">
-                                <input autoFocus type="text" value={userTyped} onChange={(e) => setUserTyped(e.target.value)} className={`w-full p-5 rounded-2xl bg-black/50 border border-white/10 ${currentTheme.borderFocus} text-center text-2xl font-bold mb-5 outline-none transition-colors shadow-inner text-white`} placeholder="Gõ đáp án..." />
+                                <input autoFocus type="text" value={userTyped} onChange={(e: any) => setUserTyped(e.target.value)} className={`w-full p-5 rounded-2xl bg-black/50 border border-white/10 ${currentTheme.borderFocus} text-center text-2xl font-bold mb-5 outline-none transition-colors shadow-inner text-white`} placeholder="Gõ đáp án..." />
                                 <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => checkQuizAnswer(userTyped)} className={`w-full py-4 bg-gradient-to-r ${currentTheme.primaryGradient} text-white font-bold text-lg rounded-2xl shadow-md`}>KIỂM TRA</motion.button>
                               </div>
                             ) : (
                               <div className={`grid gap-4 mt-6 ${quizMode === "Dạng 4 (Loại từ)" || quizMode === "Dạng 5 (Giới từ)" ? 'grid-cols-3 sm:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2'}`}>
-                                {(quizQuestions[quizIdx].options || []).map((opt, i) => {
+                                {(quizQuestions[quizIdx].options || []).map((opt: any, i: number) => {
                                   
-                                  // FIX: Loại bỏ transition-all để bảo toàn hiệu ứng nhún nhảy Framer
                                   let btnClass = "bg-black/40 border-white/10 text-gray-200 transition-colors transition-shadow duration-300";
                                   let iconClass = "bg-white/10 text-gray-400 transition-colors duration-300";
                                   
@@ -653,13 +651,13 @@ export default function HieuHubMaster() {
                                       iconClass = "bg-white/5 text-gray-600";
                                     }
                                   } else {
-                                    btnClass += ` ${currentTheme.hoverAns}`; // Dải đèn mờ khi Di chuột (Dạng 2-8)
+                                    btnClass += ` ${currentTheme.hoverAns}`;
                                   }
 
                                   return (
                                     <motion.button key={i} 
                                       initial={false}
-                                      animate={{ scale: quizFeedback && quizFeedback.clickedOpt === opt ? 1.02 : 1 }} // Nổi bự khi click
+                                      animate={{ scale: quizFeedback && quizFeedback.clickedOpt === opt ? 1.02 : 1 }} 
                                       whileHover={!quizFeedback ? { scale: 1.03 } : {}} 
                                       whileTap={!quizFeedback ? { scale: 0.95 } : {}} 
                                       onClick={() => checkQuizAnswer(opt)} 
@@ -707,7 +705,7 @@ export default function HieuHubMaster() {
 
                 {wrongAnswers.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {[...wrongAnswers].reverse().map((item, idx) => (
+                    {[...wrongAnswers].reverse().map((item: any, idx: number) => (
                       <motion.div key={idx} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: idx * 0.05 }} className="bg-white/5 backdrop-blur-sm p-6 rounded-3xl border border-white/10 shadow-lg relative overflow-hidden">
                         <span className="absolute top-0 right-0 bg-white/10 text-gray-300 text-[10px] px-3 py-1 rounded-bl-xl font-bold">{item.mode}</span>
                         <p className="font-bold text-xl text-white mb-2">{item.question}</p>
@@ -750,7 +748,7 @@ export default function HieuHubMaster() {
                       <p className="text-base font-medium">Hỏi AI về từ vựng, ngữ pháp...</p>
                     </div>
                   )}
-                  {chatMessages.map((msg, i) => (
+                  {chatMessages.map((msg: any, i: number) => (
                     <motion.div key={i} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className={`p-4 rounded-2xl max-w-[85%] leading-relaxed text-sm shadow-lg ${msg.role === 'user' ? `bg-gradient-to-r ${currentTheme.primaryGradient} text-white self-end rounded-br-sm` : 'bg-black/40 border border-white/10 self-start rounded-bl-sm text-gray-200'}`}>
                       {msg.role === 'user' ? (
                         <div className="whitespace-pre-wrap font-medium">{msg.content}</div>
@@ -772,7 +770,7 @@ export default function HieuHubMaster() {
                   ))}
                 </div>
                 <div className={`flex gap-3 bg-black/40 p-2.5 rounded-full border border-white/10 ${currentTheme.borderFocus} transition-colors shadow-inner`}>
-                  <input type="text" value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendAiMessage()} className="flex-1 bg-transparent outline-none text-base px-4 text-white" placeholder="Nhắn tin cho AI..." />
+                  <input type="text" value={chatInput} onChange={(e: any) => setChatInput(e.target.value)} onKeyDown={(e: any) => e.key === 'Enter' && sendAiMessage()} className="flex-1 bg-transparent outline-none text-base px-4 text-white" placeholder="Nhắn tin cho AI..." />
                   <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} onClick={sendAiMessage} className={`bg-gradient-to-r ${currentTheme.primaryGradient} text-white font-bold px-8 rounded-full text-sm ${currentTheme.shadowGlow}`}>GỬI</motion.button>
                 </div>
               </div>
@@ -781,6 +779,7 @@ export default function HieuHubMaster() {
         </AnimatePresence>
       </div>
       
+      {/* ĐÃ SỬA LỖI CHÍNH TẢ Ở ĐÂY */}
       <style dangerouslySetInnerHTML={{__html: `
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
