@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown'; 
 
 // ==========================================
-// CẤU HÌNH THEME (ĐÃ TƯƠNG THÍCH TYPESCRIPT)
+// CẤU HÌNH THEME
 // ==========================================
 const THEMES = [
   {
@@ -120,9 +120,6 @@ export default function HieuHubMaster() {
   const [chatMessages, setChatMessages] = useState<any[]>([]);
   const [chatInput, setChatInput] = useState("");
 
-  // ==========================================
-  // TÍNH NĂNG MỚI: SIDEBAR MOBILE & BỘ ĐẾM CÂU
-  // ==========================================
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [totalQuestionsDone, setTotalQuestionsDone] = useState(0);
 
@@ -139,7 +136,6 @@ export default function HieuHubMaster() {
       const foundTheme = THEMES.find(t => t.id === savedThemeId);
       if (foundTheme) setCurrentTheme(foundTheme);
     }
-    // Tải bộ đếm từ localStorage
     const savedTotal = localStorage.getItem("hieu_hub_total_done");
     if (savedTotal) setTotalQuestionsDone(Number(savedTotal));
   }, []);
@@ -149,7 +145,6 @@ export default function HieuHubMaster() {
     localStorage.setItem("hieu_hub_theme", theme.id);
   };
 
-  // Hàm tăng số câu đã làm và lưu vào LocalStorage
   const addTotalDone = (amount: number) => {
     setTotalQuestionsDone(prev => {
       const newTotal = prev + amount;
@@ -171,11 +166,11 @@ export default function HieuHubMaster() {
 
   const handleLogout = () => {
     localStorage.removeItem("hieu_hub_user");
-    localStorage.removeItem("hieu_hub_total_done"); // Xóa bộ đếm khi đăng xuất
+    localStorage.removeItem("hieu_hub_total_done"); 
     setIsLoggedIn(false);
     setUsername("");
     setPassword("");
-    setTotalQuestionsDone(0); // Reset bộ đếm trên giao diện
+    setTotalQuestionsDone(0); 
     setWrongAnswers([]);
   };
 
@@ -207,7 +202,6 @@ export default function HieuHubMaster() {
   const checkQuizAnswer = (answer: any) => {
     if (quizFeedback) return;
     
-    // Tăng đếm 1 câu khi hoàn thành 1 câu hỏi lẻ
     addTotalDone(1);
 
     const currentQ = quizQuestions[quizIdx];
@@ -237,8 +231,6 @@ export default function HieuHubMaster() {
 
   const handleSubmitDang1 = () => {
     setDang1Submitted(true);
-    
-    // Tăng đếm tổng số câu của toàn bộ đề Trắc nghiệm khi nộp bài
     addTotalDone(quizQuestions.length);
 
     const newMistakes: any[] = [];
@@ -359,17 +351,14 @@ export default function HieuHubMaster() {
       <motion.button 
         whileTap={{ scale: 0.9 }}
         onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
-        className="md:hidden fixed top-3 left-3 z-50 bg-black/70 backdrop-blur-md border border-white/20 p-2.5 rounded-xl text-white shadow-xl"
+        className="md:hidden fixed top-3 left-3 z-[100] bg-black/70 backdrop-blur-md border border-white/20 p-2.5 rounded-xl text-white shadow-xl"
       >
         <span className="text-base font-bold">{isSidebarOpen ? '✕' : '☰'}</span>
       </motion.button>
 
-      {/* --- SIDEBAR CÓ HIỆU ỨNG MOTION & RESPONSIVE --- */}
-      <motion.div 
-        initial={false}
-        animate={{ x: isSidebarOpen ? 0 : '-100%' }}
-        className="fixed md:relative inset-y-0 left-0 z-40 w-64 md:translate-x-0 m-0 md:m-4 md:rounded-[1.5rem] bg-[#0b0f19]/95 md:bg-white/5 backdrop-blur-2xl border-r md:border border-white/10 flex flex-col p-5 shadow-[0_0_30px_rgba(0,0,0,0.5)] overflow-y-auto"
-        style={{ transform: typeof window !== 'undefined' && window.innerWidth >= 768 ? 'none' : undefined }}
+      {/* --- SIDEBAR ĐÃ SỬA LẠI BẰNG CSS THUẦN ĐỂ LUÔN HIỆN TRÊN DESKTOP --- */}
+      <div 
+        className={`fixed md:relative inset-y-0 left-0 z-50 w-64 m-0 md:m-4 md:rounded-[1.5rem] bg-[#0b0f19]/95 md:bg-white/5 backdrop-blur-2xl border-r md:border border-white/10 flex flex-col p-5 shadow-[0_0_30px_rgba(0,0,0,0.5)] overflow-y-auto transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
         
         <div className={`absolute -top-20 -left-20 w-32 h-32 blur-[50px] rounded-full pointer-events-none hidden md:block ${currentTheme.bgBadge}`}></div>
@@ -382,7 +371,6 @@ export default function HieuHubMaster() {
           <h2 className="text-xs md:text-sm font-bold text-gray-400">Xin chào,</h2>
           <h1 className={`text-base md:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r ${currentTheme.textGradient} truncate px-2`}>{username}</h1>
           
-          {/* BỘ ĐẾM CÂU */}
           <div className="mt-3 bg-black/40 rounded-lg py-2 px-4 border border-white/10 inline-flex items-center gap-2 shadow-inner">
             <span className="text-[10px] md:text-xs text-gray-400 font-bold tracking-widest">🎯 ĐÃ LÀM:</span>
             <span className={`text-xs md:text-sm font-black ${currentTheme.textAccent}`}>{totalQuestionsDone} CÂU</span>
@@ -456,7 +444,7 @@ export default function HieuHubMaster() {
         <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} onClick={handleLogout} className="relative z-50 w-full text-xs md:text-sm font-bold bg-red-500/10 hover:bg-red-500/20 text-red-400 py-3 rounded-xl transition-colors border border-red-500/20 flex items-center justify-center gap-2">
           <span>🚪</span> Đăng xuất
         </motion.button>
-      </motion.div>
+      </div>
 
       {/* --- MAIN CONTENT AREA --- */}
       <div className="flex-1 overflow-y-auto p-4 md:p-8 relative scroll-smooth z-10 pt-16 md:pt-8">
@@ -467,7 +455,7 @@ export default function HieuHubMaster() {
               <div>
                 <h2 className={`text-2xl md:text-3xl font-black mb-4 md:mb-6 text-transparent bg-clip-text bg-gradient-to-r ${currentTheme.textGradient}`}>Kho Từ Vựng</h2>
                 <div className="bg-white/5 backdrop-blur-xl p-4 md:p-5 rounded-2xl border border-white/10 mb-5 md:mb-6 shadow-xl flex flex-col md:flex-row gap-3 md:gap-4 items-center relative z-20">
-                  <input type="text" placeholder="🔍 Tìm kiếm từ vựng..." value={searchTerm} onChange={(e: any) => setSearchTerm(e.target.value)} className={`flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 md:py-3 text-sm md:text-base text-white outline-none ${currentTheme.borderFocus} transition-colors shadow-inner w-full`} />
+                  <input type="text" placeholder="🔍 Tìm kiếm từ vựng..." value={searchTerm} onChange={(e: any) => setSearchTerm(e.target.value)} className={`flex-1 bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 text-xs md:text-sm text-white outline-none ${currentTheme.borderFocus} transition-colors shadow-inner w-full`} />
                   <div className="flex bg-black/40 p-1 md:p-1.5 rounded-xl border border-white/10 overflow-x-auto w-full md:w-auto">
                     {ALPHABETS.slice(0, 10).map((letter: any) => <button key={letter} onClick={() => setAlphaFilter(letter)} className={`min-w-[28px] md:min-w-[32px] h-7 md:h-8 rounded-lg font-bold transition-all text-[10px] md:text-xs ${alphaFilter === letter ? `${currentTheme.bgAccent} text-white shadow-lg` : 'text-gray-400 hover:bg-white/10'}`}>{letter}</button>)}
                     <span className="text-gray-600 self-center px-1 text-[10px] md:text-xs">...</span>
@@ -476,7 +464,7 @@ export default function HieuHubMaster() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
                   {filteredDashboardData.length > 0 ? filteredDashboardData.map((item: any, i: number) => (
-                    <motion.div key={i} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: (i % 15) * 0.02 }} whileHover={{ y: -4 }} className={`bg-white/5 backdrop-blur-sm p-4 md:p-5 rounded-2xl border border-white/10 shadow-lg hover:${currentTheme.shadowGlow} hover:bg-white/10 transition-all cursor-default group relative overflow-hidden`}>
+                    <motion.div key={i} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: (i % 15) * 0.02 }} whileHover={{ y: -3 }} className={`bg-white/5 backdrop-blur-sm p-4 md:p-5 rounded-2xl border border-white/10 shadow-lg hover:${currentTheme.shadowGlow} hover:bg-white/10 transition-all cursor-default group relative overflow-hidden`}>
                       <div className="absolute top-0 right-0 p-3 opacity-5 group-hover:opacity-10 transition-opacity"><span className={`text-4xl md:text-5xl font-black ${currentTheme.textAccent}`}>{item['Từ'][0]?.toUpperCase()}</span></div>
                       <div className="flex justify-between items-start mb-2 md:mb-3">
                         <p className="font-bold text-lg md:text-xl text-white tracking-tight">{item['Từ']}</p>
