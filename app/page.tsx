@@ -188,7 +188,7 @@ export default function HieuHubMaster() {
     try {
       const res = await axios.post('https://hieu-hub-backend.onrender.com/api/generate-quiz', { 
         sheet_url: currentSheetUrl, mode: quizMode,
-        num: quizMode === "Dạng 1 (Trắc nghiệm)" ? Number(numQuestions) : 10
+        num: quizMode === "Dạng 1 (Trắc nghiệm)" ? Number(numQuestions) : 50
       });
       if (res.data.success) setQuizQuestions(res.data.data);
     } catch (e) {}
